@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import productRoutes from "./routes/productRoutes.js";
 
 // Load environment variables from .env
 dotenv.config();
@@ -17,8 +18,11 @@ app.use(express.json());
 
 // Test route
 app.get("/", (req, res) => {
-  res.json({ message: "Vayre API is running " });
+  res.json({ message: "Vayre API is running" });
 });
+
+// Routes
+app.use("/api/products", productRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
