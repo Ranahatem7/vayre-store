@@ -56,6 +56,7 @@ function Cart() {
 
       <button onClick={clearCart}>Clear cart</button>
       <Link to="/shop">Continue shopping</Link>
+      <Link to="/checkout">Checkout</Link>
     </div>
   );
 }

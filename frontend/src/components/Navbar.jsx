@@ -20,6 +20,7 @@ function Navbar() {
 
       {user ? (
         <>
+          <Link to="/orders">Orders</Link>
           <span>{user.name}</span>
           <button onClick={handleLogout}>Logout</button>
         </>
