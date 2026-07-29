@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import AdminLayout from "./components/AdminLayout";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
@@ -10,6 +12,9 @@ import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function App() {
   return (
@@ -46,6 +51,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

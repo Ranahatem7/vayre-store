@@ -120,3 +120,45 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get all orders
+// @route   GET /api/orders
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update an order's status
+// @route   PUT /api/orders/:id/status
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    // Read the allowed values straight from the schema instead of
+    // duplicating the enum list here, so they can't drift out of sync.
+    const allowedStatuses = Order.schema.path("status").enumValues;
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid order status" });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -14,3 +14,8 @@ export const getProfile = async () => {
   const { data } = await api.get("/users/profile");
   return data;
 };
+
+export const getUsers = async () => {
+  const { data } = await api.get("/users");
+  return data;
+};
