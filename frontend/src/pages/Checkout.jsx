@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { createOrder } from "../services/orderService";
+import { useIsDesktop } from "../hooks/useIsDesktop";
+import { colors, fonts, radii, spacing } from "../theme";
+import ImagePlaceholder from "../components/ImagePlaceholder";
+import Button from "../components/Button";
+import FormField from "../components/FormField";
+import ErrorBanner from "../components/ErrorBanner";
 
 function Checkout() {
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
+  const isDesktop = useIsDesktop();
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
@@ -41,83 +48,125 @@ function Checkout() {
     }
   };
 
+  const pagePadding = isDesktop ? `${spacing.xl}px ${spacing.xxl}px` : `${spacing.lg}px ${spacing.md}px`;
+
   if (items.length === 0) {
     return (
-      <div>
-        <h1>Checkout</h1>
-        <p>Your cart is empty.</p>
-        <Link to="/shop">Continue shopping</Link>
+      <div style={{ padding: pagePadding, textAlign: "center", minHeight: "50vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: spacing.md }}>
+        <h1 style={{ fontSize: 28, fontWeight: 500, color: colors.text }}>Checkout</h1>
+        <p style={{ color: colors.textMuted }}>Your cart is empty.</p>
+        <Button to="/shop">Continue shopping</Button>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1>Checkout</h1>
+    <div style={{ padding: pagePadding }}>
+      <h1 style={{ fontSize: isDesktop ? 32 : 24, fontWeight: 500, color: colors.text, marginBottom: spacing.xl }}>
+        Checkout
+      </h1>
 
-      {error && <p>{error}</p>}
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
-      <h3>Order summary</h3>
-      {items.map((item) => (
-        <div key={item.key}>
-          <p>
-            {item.name} ({item.color} / {item.size}) × {item.quantity}
-          </p>
-          <p>{item.price * item.quantity} EGP</p>
-        </div>
-      ))}
-      <p>Subtotal: {subtotal} EGP</p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: isDesktop ? "row" : "column-reverse",
+          gap: spacing.xl,
+        }}
+      >
+        <form onSubmit={handleSubmit} style={{ flex: 1.2 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, marginBottom: spacing.md }}>
+            Shipping details
+          </h3>
 
-      <h3>Shipping details</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="fullName">Full name</label>
-          <input
+          <FormField
+            label="Full name"
             id="fullName"
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
           />
-        </div>
 
-        <div>
-          <label htmlFor="address">Address</label>
-          <input
+          <FormField
+            label="Address"
             id="address"
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             required
           />
-        </div>
 
-        <div>
-          <label htmlFor="city">City</label>
-          <input
+          <FormField
+            label="City"
             id="city"
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             required
           />
-        </div>
 
-        <div>
-          <label htmlFor="phone">Phone</label>
-          <input
+          <FormField
+            label="Phone"
             id="phone"
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
           />
-        </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Placing order..." : "Place Order"}
-        </button>
-      </form>
+          <Button type="submit" disabled={loading} style={{ width: "100%", marginTop: spacing.sm }}>
+            {loading ? "Placing order..." : "Place Order"}
+          </Button>
+        </form>
+
+        <div
+          style={{
+            flex: 1,
+            height: "fit-content",
+            padding: spacing.lg,
+            borderRadius: radii.lg,
+            background: colors.surface,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.text, marginBottom: spacing.md }}>
+            Order summary
+          </h3>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: spacing.sm }}>
+            {items.map((item) => (
+              <div key={item.key} style={{ display: "flex", gap: spacing.sm, alignItems: "center" }}>
+                <div style={{ width: 48, height: 60, flexShrink: 0, borderRadius: radii.sm, overflow: "hidden", background: colors.bgAlt }}>
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <ImagePlaceholder />
+                  )}
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, color: colors.text, fontFamily: fonts.heading }}>
+                    {item.name}
+                  </p>
+                  <p style={{ fontSize: 12, color: colors.textFaint }}>
+                    {item.color} / {item.size} × {item.quantity}
+                  </p>
+                </div>
+
+                <p style={{ fontSize: 13, color: colors.textMuted }}>{item.price * item.quantity} EGP</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ borderTop: `1px solid ${colors.border}`, marginTop: spacing.md, paddingTop: spacing.md }}>
+            <p style={{ fontSize: 16, fontWeight: 600, color: colors.text }}>
+              Subtotal: <span style={{ color: colors.purple[300] }}>{subtotal} EGP</span>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

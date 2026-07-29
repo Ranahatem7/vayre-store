@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { colors } from "../theme";
+import AuthCard from "../components/AuthCard";
+import FormField from "../components/FormField";
+import Button from "../components/Button";
 
 function Login() {
   const { login } = useAuth();
@@ -26,43 +30,42 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-
-      {error && <p>{error}</p>}
-
+    <AuthCard
+      title="Login"
+      error={error}
+      footer={
+        <>
+          Don't have an account?{" "}
+          <Link to="/register" style={{ color: colors.purple[300], fontWeight: 500 }}>
+            Register
+          </Link>
+        </>
+      }
+    >
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+        <FormField
+          label="Email"
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        <FormField
+          label="Password"
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-        <button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} style={{ width: "100%", marginTop: 8 }}>
           {loading ? "Logging in..." : "Login"}
-        </button>
+        </Button>
       </form>
-
-      <p>
-        Don't have an account? <Link to="/register">Register</Link>
-      </p>
-    </div>
+    </AuthCard>
   );
 }
 
